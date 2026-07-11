@@ -46,17 +46,23 @@ def _lead_webhook(kind, payload, tarif):
         return
     try:
         import requests
+        korridor = tarif.get("korridor") or (None, None)
+        killer = payload.get("killer") or {}
+        # Nur flache Skalarfelder (kein Array/Dict) -- robust fuers Make-Webhook-Mapping,
+        # gleiches Muster wie das bewaehrte Szenario "Rechner-Lead -> Pipedrive".
         slim = {
             "kind": kind, "ts": datetime.datetime.now().isoformat(),
             "anrede": payload.get("anrede"), "vorname": payload.get("vorname"), "nachname": payload.get("nachname"),
             "firma": payload.get("firma"), "strasse": payload.get("strasse"), "hausnr": payload.get("hausnr"),
             "plz": payload.get("plz"), "ort": payload.get("ort"), "gruendung": payload.get("gruendung"),
-            "kategorien_alle": payload.get("kategorien_alle"), "kanaele": payload.get("kanaele"),
+            "kategorien_alle": ", ".join(payload.get("kategorien_alle") or []),
+            "kanaele": ", ".join(payload.get("kanaele") or []),
             "umsatz_gesamt": payload.get("umsatz_gesamt"), "umsatz_exakt": payload.get("umsatz_exakt"),
-            "usa_export": payload.get("usa_export"), "module": payload.get("module"),
-            "ausschreibung": payload.get("ausschreibung"), "killer": payload.get("killer"),
+            "usa_export": payload.get("usa_export"), "module": ", ".join(payload.get("module") or []),
+            "ausschreibung": bool(payload.get("ausschreibung")),
+            "killer_auffaellig": any(killer.values()) if killer else False,
             "beginn": payload.get("beginn"), "weblinks": payload.get("weblinks"), "beschreibung": payload.get("beschreibung"),
-            "tarif_brutto": tarif.get("brutto"), "tarif_korridor": tarif.get("korridor"),
+            "tarif_brutto": tarif.get("brutto"), "tarif_korridor_min": korridor[0], "tarif_korridor_max": korridor[1],
             "utm_source": payload.get("utm_source"), "utm_medium": payload.get("utm_medium"), "utm_campaign": payload.get("utm_campaign"),
             "broker_pool": payload.get("broker_pool"), "hv": payload.get("hv"),
         }
