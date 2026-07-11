@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Mein Schutzschirm · Online-Shops</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--gruen:#0b3d2e;--gruen2:#13503c;--gold:#b08d3f;--gold2:#c9a960;--tinte:#1a2b4a;--bg:#f6f4ee;--card:#fff;--line:#e7e2d6;--grau:#6b7280;--ok:#1f7a52;--rot:#b23b3b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,sans-serif;background:var(--bg);color:var(--tinte);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:880px;margin:0 auto;padding:0 18px 80px}
+.appbar{background:var(--gruen);color:#fff;font-size:12.5px;text-align:center;padding:7px 12px;letter-spacing:.2px}
+.appbar b{color:var(--gold2)}
+header.brand{display:flex;align-items:center;justify-content:space-between;padding:18px 0 8px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--gruen)}
+.bow{width:26px;height:18px}
+.trust-top{font-size:11.5px;color:var(--grau);text-align:right;line-height:1.35}
+.trust-top b{color:var(--gruen)}
+.steps{display:flex;gap:6px;margin:10px 0 22px;flex-wrap:wrap}
+.steps .s{flex:1;min-width:80px;font-size:11px;color:var(--grau);border-top:3px solid var(--line);padding-top:6px;font-weight:600}
+.steps .s.on{color:var(--gruen);border-color:var(--gold)}
+.steps .s.done{color:var(--gruen);border-color:var(--gruen)}
+h1{font-size:25px;font-weight:800;color:var(--gruen);letter-spacing:-.3px;margin-bottom:6px}
+h1 .g{color:var(--gold)}
+.sub{color:var(--grau);font-size:14.5px;margin-bottom:18px;max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,40,30,.03)}
+label.fld{display:block;font-size:12.5px;font-weight:700;color:var(--gruen);margin:0 0 5px}
+input[type=text],input[type=number],input[type=email],input[type=url],select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-family:inherit;font-size:14.5px;color:var(--tinte);background:#fcfbf8}
+textarea{min-height:84px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:600px){.grid2,.grid3{grid-template-columns:1fr}}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;background:#fcfbf8;user-select:none;transition:.12s}
+.chip.on{border-color:var(--gruen);background:var(--gruen);color:#fff}
+.chip.ext.on{background:var(--gold);border-color:var(--gold)}
+.range{appearance:none;width:100%;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gruen));outline:none}
+.range::-webkit-slider-thumb{appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--gruen);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.mod{border:1.5px solid var(--line);border-radius:14px;padding:15px;margin-bottom:11px;transition:.15s;position:relative;background:#fff}
+.mod.on{border-color:var(--gruen);box-shadow:0 2px 10px rgba(11,61,46,.07)}
+.mod.off{opacity:.62;background:#faf9f5}
+.mod .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.mod .ttl{font-weight:800;font-size:16px;color:var(--gruen);display:flex;align-items:center;gap:8px}
+.tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--gold);color:#fff;letter-spacing:.4px;text-transform:uppercase}
+.tag.opt{background:#eee;color:var(--grau)}
+.mod .price{font-weight:800;font-size:17px;color:var(--tinte);white-space:nowrap}
+.mod .price small{display:block;font-size:10.5px;color:var(--grau);font-weight:600;text-align:right}
+.mod .ben{font-size:13px;color:var(--tinte);margin:9px 0 4px}
+.mod .ohne{font-size:12px;color:var(--rot);font-weight:600}
+.addon{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px dashed var(--line);margin-top:11px;padding-top:9px;font-size:13px}
+.addon .ad-l b{color:var(--gruen)}
+.addon .ad-l span{display:block;font-size:11.5px;color:var(--grau)}
+.switch{position:relative;width:44px;height:25px;flex:0 0 auto;cursor:pointer}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:#ccc;border-radius:999px;transition:.18s}
+.slider:before{content:"";position:absolute;width:19px;height:19px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.18s}
+.switch input:checked+.slider{background:var(--gruen)}
+.switch input:checked+.slider:before{transform:translateX(19px)}
+.totbar{position:sticky;bottom:0;background:var(--gruen);color:#fff;border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:10px;box-shadow:0 6px 22px rgba(11,61,46,.25);z-index:5}
+.totbar .lab{font-size:12px;opacity:.85}
+.totbar .big{font-size:23px;font-weight:800}
+.totbar .big small{font-size:12px;font-weight:600;opacity:.8}
+.totbar .kor{font-size:11px;color:var(--gold2)}
+.btn{background:var(--gold);color:#fff;border:none;border-radius:11px;padding:13px 24px;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:.12s}
+.btn:hover{background:var(--gold2)}
+.btn.ghost{background:transparent;color:var(--gruen);border:1.5px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:18px}
+.kf{display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;padding:12px 14px;margin-bottom:9px;background:#fff}
+.kf .q{font-size:13.5px;font-weight:600}
+.yn{display:flex;gap:6px;flex:0 0 auto}
+.yn button{border:1.5px solid var(--line);background:#fcfbf8;border-radius:8px;padding:7px 16px;font-weight:700;font-size:13px;cursor:pointer;color:var(--grau)}
+.yn button.ja{border-color:var(--ok);color:#fff;background:var(--ok)}
+.yn button.nein{border-color:var(--gruen);color:#fff;background:var(--gruen)}
+.sig{border:1.5px dashed var(--gold);border-radius:12px;background:#fffdf8;touch-action:none;width:100%;height:150px;display:block}
+.muted{font-size:12px;color:var(--grau)}
+.pill{display:inline-block;background:#eef4f0;color:var(--gruen);border-radius:8px;padding:3px 9px;font-size:11.5px;font-weight:700;margin:2px 4px 2px 0}
+.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.summary-row.tot{font-weight:800;color:var(--gruen);font-size:16px;border:none;padding-top:12px}
+.cert{border:1.5px solid var(--gold);border-radius:14px;padding:20px;text-align:center;background:linear-gradient(180deg,#fffdf7,#fbf8ef)}
+.cert .big{font-size:21px;font-weight:800;color:var(--gruen);margin:6px 0}
+.fly-load{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 0;gap:18px}
+.fly{width:60px;height:42px;animation:fly 1.1s ease-in-out infinite}
+@keyframes fly{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+.hero{background:linear-gradient(160deg,var(--gruen),var(--gruen2));color:#fff;border-radius:18px;padding:28px 24px;margin-bottom:16px}
+.hero h1{color:#fff;font-size:27px;margin-bottom:10px}
+.hero h1 .g{color:var(--gold2)}
+.hero p{color:#e8efe9;font-size:15px;max-width:560px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:600px){.vgrid{grid-template-columns:1fr}}
+.vcard{border:1.5px solid var(--line);border-radius:14px;padding:16px;background:#fff;cursor:pointer;transition:.14s;position:relative}
+.vcard.on{border-color:var(--gruen);box-shadow:0 3px 14px rgba(11,61,46,.1);background:#fcfefb}
+.vcard .vi{width:34px;height:34px;border-radius:9px;background:#eef4f0;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px}
+.vcard.on .vi{background:var(--gruen)}
+.vcard h3{font-size:15px;color:var(--gruen);font-weight:800;margin-bottom:5px}
+.vcard p{font-size:12.5px;color:var(--grau);line-height:1.45}
+.vcard .pick{position:absolute;top:13px;right:13px;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px}
+.vcard.on .pick{background:var(--gruen);border-color:var(--gruen)}
+.commit{background:#fff;border:1.5px solid var(--gold);border-radius:14px;padding:18px;text-align:center;margin-bottom:14px}
+.commit p{font-size:13.5px;color:var(--tinte);margin-bottom:12px}
+.btn.big{padding:16px 30px;font-size:16.5px;width:100%;max-width:420px}
+.note{font-size:12px;color:var(--grau);text-align:center;margin-top:10px}
+.note b{color:var(--gruen)}
+.info{background:#eef4f0;border:1px solid #d6e4dc;border-radius:12px;padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--gruen)}
+.info b{color:var(--gruen)}
+.flow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.flow .st{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11.5px;color:var(--tinte)}
+.flow .st b{display:block;color:var(--gruen);font-size:12px}
+.subhead{font-size:11.5px;font-weight:700;color:var(--grau);text-transform:uppercase;letter-spacing:.4px;margin:12px 0 7px}
+</style>
+</head>
+<body>
+<div class="appbar">100&nbsp;% unabhängig · kostenfreier Service · <b>Leistung zuerst</b> – wir schreiben für dich am Markt aus</div>
+<div class="wrap">
+<header class="brand">
+  <div class="logo"><svg class="bow" viewBox="0 0 52 36"><path d="M26 18 L6 6 Q2 4 2 10 L2 26 Q2 32 6 30 Z" fill="#0b3d2e"/><path d="M26 18 L46 6 Q50 4 50 10 L50 26 Q50 32 46 30 Z" fill="#0b3d2e"/><rect x="22" y="12" width="8" height="12" rx="2" fill="#b08d3f"/></svg> Mein&nbsp;Schutzschirm</div>
+  <div class="trust-top"><b>IHK-geprüft</b> · 10+ Jahre Erfahrung<br>Beraterhaftung <b>10 Mio €</b> · A-Rating-Träger</div>
+</header>
+<div class="steps" id="steps"></div>
+<div id="app"></div>
+</div>
+<script>
+"use strict";
+var VST=0.19;
+var UMSATZ_BANDS=[[100000,1.00],[250000,1.35],[500000,1.8],[1000000,2.5],[5000000,4.2]];
+var SUM_FACTOR={0:1.00,1:1.30,2:1.70,3:2.20};
+var BASE={bhv:89,vsh:290,cyber:365,sach:250};
+var AMAZON_COI=15;
+var USA_EXPORT={keiner:0,gering:250,mittel:600,hoch:900,sehr_hoch:1400};
+var USA_LABEL={keiner:"kein USA-Export",gering:"bis 10 % USA/Kanada",mittel:"bis 25 % USA/Kanada",hoch:"bis 50 % USA/Kanada",sehr_hoch:"über 50 % USA/Kanada"};
+var DISC={gruender:0.15,laufzeit3j:0.10,buendel:0.05};
+var PAY_SUR={jaehrlich:0,halbjaehrlich:0,vierteljaehrlich:0.02,monatlich:0.03};
+var SUM_LABEL=["Basis (Standard)","Komfort (empfohlen)","Premium","Maximal"];
+// Produktkategorien – HISCOX-mappbar (hx) ODER erweitert (hx:null -> Daten/Ausschreibung)
+var KAT=[
+ {id:"bekleidung",label:"Bekleidung & Accessoires",hx:"1"},
+ {id:"buero",label:"Büro & Haushalt",hx:"2"},
+ {id:"freizeit",label:"Freizeit & Hobby",hx:"2"},
+ {id:"it",label:"IT & Elektronik",hx:"3"},
+ {id:"food",label:"Lebensmittel & Getränke",hx:"4"},
+ {id:"kosmetik",label:"Kosmetik & Drogerie",hx:null},
+ {id:"moebel",label:"Möbel & Einrichtung",hx:"2"},
+ {id:"spielwaren",label:"Spielwaren & Babyartikel",hx:"2"},
+ {id:"schmuck",label:"Schmuck & Uhren",hx:null},
+ {id:"sport",label:"Sport & Outdoor",hx:"2"},
+ {id:"auto",label:"Auto- & Motorradteile",hx:null},
+ {id:"tier",label:"Tierbedarf",hx:"2"},
+ {id:"nem",label:"Nahrungsergänzung",hx:null},
+ {id:"medizin",label:"Gesundheit & Medizinprodukte",hx:null},
+ {id:"garten",label:"Pflanzen & Garten",hx:"2"},
+ {id:"kunst",label:"Kunst & Handgemachtes",hx:null},
+ {id:"digital",label:"Digitale Produkte & Software",hx:null},
+ {id:"sonstiges",label:"Sonstiges",hx:null}
+];
+var KATBY={}; KAT.forEach(function(k){KATBY[k.id]=k;});
+var HXNAME={"1":"bekleidung","2":"buero","3":"it","4":"food"};
+var KANAELE=[
+ {id:"webshop",label:"Eigener Webshop (Shopify, WooCommerce …)"},
+ {id:"amazon",label:"Amazon",amz:true},
+ {id:"ebay",label:"eBay"},
+ {id:"etsy",label:"Etsy"},
+ {id:"marktplatz",label:"Weitere Marktplätze (Kaufland, OTTO, Zalando …)"},
+ {id:"social",label:"Social Commerce (Instagram, TikTok Shop)"},
+ {id:"app",label:"Eigene App"},
+ {id:"stationaer",label:"Stationär / Ladengeschäft"},
+ {id:"b2b",label:"Großhandel / B2B"},
+ {id:"markt",label:"Märkte / Pop-up"}
+];
+var MODULE={
+ bhv:{label:"Betriebshaftpflicht",pflicht:true,benefit:"Zahlt, wenn dein Produkt oder Betrieb einem Kunden schadet – inkl. Import & Eigenmarke (du haftest wie der Hersteller), Urheberrecht und AGG bis 25.000 €.",ohne:"Pflicht-Baustein – ohne ihn trägst du Schadenersatz an Kunden selbst."},
+ vsh:{label:"Vermögensschadenhaftpflicht",pflicht:false,benefit:"Deckt reine Vermögensschäden – Falschlieferung, Beratungs- oder Berechnungsfehler – über die 25.000 € der Betriebshaftpflicht hinaus.",ohne:"Ohne VSH bleibst du bei reinen Vermögensschäden über 25.000 € auf den Kosten sitzen."},
+ cyber:{label:"Cyber & Datenrisiken",pflicht:false,benefit:"Hackerangriff, Datenleck, IT-Betriebsunterbrechung und Erpressung – mit Soforthilfe und voller Kostenübernahme.",ohne:"Ohne Cyber zahlst du Wiederherstellung, Anwalt und Ausfall nach einem Angriff selbst."},
+ sach:{label:"Sachinhalt & Elektronik",pflicht:false,benefit:"Echte Allgefahren für Ware, Lager und Technik – auch Diebstahl unterwegs/auf Messen, inkl. Vertrauensschäden durch Mitarbeiter.",ohne:"Ohne Sachschutz ist verlorene oder zerstörte Ware und Technik dein Risiko."}
+};
+function umsatzFactor(u){for(var i=0;i<UMSATZ_BANDS.length;i++){if(u<=UMSATZ_BANDS[i][0])return UMSATZ_BANDS[i][1];}return UMSATZ_BANDS[UMSATZ_BANDS.length-1][1];}
+function eur(x){return x.toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2})+" €";}
+function eur0(x){return Math.round(x).toLocaleString("de-DE")+" €";}
+function calc(){
+ var uf=umsatzFactor(S.umsatz_gesamt), sf=SUM_FACTOR[S.sumIdx];
+ var L={}, addons={};
+ L.bhv_base=Math.round(BASE.bhv*uf*sf);
+ addons.amazon=(S.amazon&&S.addon_amazon)?AMAZON_COI:0;
+ addons.usa=(S.addon_usa&&S.usa_export!=="keiner")?USA_EXPORT[S.usa_export]:0;
+ var bhv=L.bhv_base+addons.amazon+addons.usa;
+ var lines={bhv:bhv};
+ if(S.mod.vsh)lines.vsh=Math.round(BASE.vsh*uf*sf);
+ if(S.mod.cyber)lines.cyber=Math.round(BASE.cyber*uf*sf);
+ if(S.mod.sach)lines.sach=Math.round(BASE.sach*uf*Math.max(1,S.standorte));
+ var sub1=0;for(var k in lines)sub1+=lines[k];
+ var nMod=Object.keys(lines).length;
+ var dBundle=nMod>=2?Math.round(sub1*DISC.buendel):0; var s2=sub1-dBundle;
+ var dRun=S.laufzeit3j?Math.round(s2*DISC.laufzeit3j):0; var s3=s2-dRun;
+ var dStart=S.gruender?Math.round(s3*DISC.gruender):0; var s4=s3-dStart;
+ var sur=Math.round(s4*PAY_SUR[S.zahlweise]); var netto=s4+sur; var brutto=Math.round(netto*(1+VST)*100)/100;
+ return{lines:lines,base:L.bhv_base,addons:addons,sub1:sub1,dBundle:dBundle,dRun:dRun,dStart:dStart,
+   netto:netto,brutto:brutto,kor:[Math.round(brutto*0.9),Math.round(brutto*1.15)]};
+}
+function nichtStandard(){
+ var nonHx=S.kategorien.some(function(id){var k=KATBY[id];return k&&!k.hx;});
+ return nonHx || S.umsatz_gesamt>=5000000;
+}
+var S={
+ step:0,
+ kategorien:["bekleidung"],
+ kanal:{webshop:true,amazon:true},
+ umsatz_gesamt:300000, umsatz_exakt:"", usa_export:"mittel", standorte:1,
+ sumIdx:1, amazon:true,
+ weblinks:"", beschreibung:"",
+ mod:{bhv:true,vsh:true,cyber:true,sach:true},
+ addon_amazon:true, addon_usa:true,
+ commitment:false, wichtig:{bhv:true,vsh:true,cyber:true,sach:true},
+ gruender:false, laufzeit3j:true, sb:true, zahlweise:"jaehrlich",
+ killer:{schaeden:false,us_tochter:false,it_security:false,kk_daten:false,hardware:false,tuersicherung:false},
+ anrede:"herr",vorname:"",nachname:"",firma:"",gruendung:"",strasse:"",hausnr:"",plz:"",ort:"",
+ sepa:{iban:"",bic:"",bank:"",inhaber:""}, beginn:"", signature:null
+};
+var STEPS=["Dein Schutz","Dein Betrieb","Zusammenstellen","Übersicht","Annahme","Abschluss"];
+var $=function(s,r){return (r||document).querySelector(s);};
+var SCHUTZ=[
+ {id:"bhv",ic:"🛡️",h:"Schäden an Kunden durch deine Produkte",p:"Dein Produkt verletzt jemanden oder beschädigt etwas – inkl. Import & Eigenmarke (du haftest wie der Hersteller)."},
+ {id:"vsh",ic:"💼",h:"Vermögensschäden",p:"Falschlieferung, Beratungs- oder Berechnungsfehler – reine Vermögensschäden über die Standarddeckung hinaus."},
+ {id:"cyber",ic:"🔒",h:"Cyberangriffe, Erpressungen & Datendiebstahl",p:"Hackerangriff, Datenleck, IT-Ausfall und Erpressung – mit Soforthilfe und voller Kostenübernahme."},
+ {id:"sach",ic:"📦",h:"Waren, Technik & Lager",p:"Allgefahren-Schutz für deine Ware, dein Lager und deine Technik – auch Diebstahl unterwegs und auf Messen."}
+];
+function renderSteps(){
+ $("#steps").innerHTML=STEPS.map(function(s,i){var c=i<S.step?"done":(i===S.step?"on":"");return '<div class="s '+c+'">'+(i+1)+". "+s+'</div>';}).join("");
+}
+function render(){
+ renderSteps();
+ var a=$("#app");
+ if(S.step===0)a.innerHTML=viewVersprechen();
+ else if(S.step===1)a.innerHTML=viewBetrieb();
+ else if(S.step===2)a.innerHTML=viewBausteine();
+ else if(S.step===3)a.innerHTML=viewUebersicht();
+ else if(S.step===4)a.innerHTML=viewAnnahme();
+ else if(S.step===5)a.innerHTML=viewAbschluss();
+ bind();
+ window.scrollTo(0,0);
+}
+function viewVersprechen(){
+ return '<div class="hero"><h1>Dein Online-Shop verdient einen <span class="g">echten Schutzschirm</span>.</h1>'+
+   '<p>Ein Schaden, eine Abmahnung, ein Hackerangriff – als Händler haftest du schnell mit allem, was du aufgebaut hast. Wir spannen den Schirm auf, der genau zu dir passt. Erst die Leistung, Details kommen später.</p></div>'+
+ '<p class="sub" style="font-weight:700;color:var(--gruen)">Was möchtest du absichern? Tipp an, was für dich zählt.</p>'+
+ '<div class="vgrid" id="schutz">'+SCHUTZ.map(function(s){var on=S.wichtig[s.id];
+   return '<div class="vcard'+(on?" on":"")+'" data-s="'+s.id+'"><div class="pick">'+(on?"✓":"")+'</div>'+
+     '<div class="vi">'+s.ic+'</div><h3>'+s.h+'</h3><p>'+s.p+'</p></div>';}).join("")+'</div>'+
+ '<div class="commit"><p><b>Klingt gut?</b> Sag uns einfach, dass du deinen Shop absichern willst – wir machen den Rest, kostenfrei und unverbindlich.</p>'+
+   '<button class="btn big" id="commit">Ja, ich will meinen Shop absichern →</button>'+
+   '<div class="note">Noch <b>keine Kosten</b>, keine Verpflichtung. Du gibst gleich nur grobe Infos – individuell für dich.</div></div>';
+}
+function viewBetrieb(){
+ var atMax=S.umsatz_gesamt>=5000000;
+ return '<h1>Erzähl uns <span class="g">kurz von dir</span>.</h1>'+
+ '<p class="sub">Nur ein paar grobe Infos – damit wir deinen Schutz individuell zuschneiden und am Markt für dich ausschreiben. Je mehr wir wissen, desto besser dein Angebot.</p>'+
+ '<div class="card"><label class="fld">Was verkaufst du? (Mehrfachauswahl)</label><div class="chips" id="kat">'+
+   KAT.map(function(k){return '<div class="chip'+(k.hx?"":" ext")+(S.kategorien.indexOf(k.id)>=0?" on":"")+'" data-k="'+k.id+'">'+k.label+'</div>';}).join("")+'</div>'+
+   '<p class="muted" style="margin-top:8px">Nicht dabei? Wähl <b>Sonstiges</b> – wir finden trotzdem eine Lösung am Markt.</p></div>'+
+ '<div class="card"><label class="fld">Über welche Kanäle verkaufst du?</label><div class="chips" id="kanal">'+
+   KANAELE.map(function(c){return '<div class="chip'+(S.kanal[c.id]?" on":"")+'" data-c="'+c.id+'">'+c.label+'</div>';}).join("")+'</div>'+
+   '<p class="muted" style="margin-top:8px">Verkaufst du über <b>Amazon</b>? Dann schalten wir die Amazon-USA-Versicherungsbestätigung (COI) als Zusatz frei – abwählbar.</p></div>'+
+ '<div class="card"><label class="fld">Jahresumsatz: <b>'+(atMax?"5 Mio € und mehr":eur0(S.umsatz_gesamt))+'</b></label>'+
+   '<input type="range" class="range" id="umsatz" min="30000" max="5000000" step="10000" value="'+S.umsatz_gesamt+'"/>'+
+   (atMax?'<div style="margin-top:12px"><label class="fld">Dein genauer Jahresumsatz (individuelle Ausschreibung)</label><input type="text" id="umsatz_exakt" placeholder="z. B. 8.500.000 €" value="'+S.umsatz_exakt+'"/><p class="muted" style="margin-top:6px">Ab 5 Mio € schreiben wir <b>individuell am Markt</b> aus – kein Standardtarif, sondern ein maßgeschneidertes Angebot.</p></div>':'')+
+   '<div class="grid2" style="margin-top:14px">'+
+     '<div><label class="fld">USA-/Kanada-Anteil (Export)</label><select id="usa">'+
+       Object.keys(USA_EXPORT).map(function(u){return '<option value="'+u+'"'+(S.usa_export===u?" selected":"")+'>'+USA_LABEL[u]+'</option>';}).join("")+'</select></div>'+
+     '<div><label class="fld">Schutz-Niveau</label><select id="sumIdx">'+
+       SUM_LABEL.map(function(l,i){return '<option value="'+i+'"'+(S.sumIdx==i?" selected":"")+'>'+l+'</option>';}).join("")+'</select></div>'+
+   '</div></div>'+
+ '<div class="card"><div class="subhead">Mehr zu deinem Shop (hilft uns beim Ausschreiben)</div>'+
+   '<label class="fld">Link(s) zu deinem Webshop / Profil</label><input type="url" id="weblinks" placeholder="https://deinshop.de, amazon.de/shops/… (mehrere mit Komma)" value="'+S.weblinks+'"/>'+
+   '<label class="fld" style="margin-top:12px">Erzähl uns mehr (Produkte, Besonderheiten, Risiken, bestehende Verträge …)</label>'+
+   '<textarea id="beschreibung" placeholder="Z. B.: Wir importieren Spielwaren aus Asien und verkaufen über Amazon FBA in DE und USA. Bestehende Police bei … läuft … aus.">'+S.beschreibung+'</textarea></div>'+
+ '<div class="nav"><button class="btn ghost" id="back">← Zurück</button><button class="btn" id="next">Weiter →</button></div>';
+}
+function ausschreibungInfo(){
+ return '<div class="info"><b>So bekommst du deinen Preis – die Markt-Ausschreibung:</b>'+
+  '<div class="flow"><div class="st"><b>1 · Leistung</b>Du stellst deinen Schutz zusammen</div>'+
+  '<div class="st"><b>2 · Ausschreibung</b>Wir holen Angebote bei mehreren Top-Versicherern</div>'+
+  '<div class="st"><b>3 · Angebote</b>Du bekommst die besten Konditionen</div>'+
+  '<div class="st"><b>4 · Police</b>Wir policieren &amp; betreuen dich</div></div>'+
+  '<p style="margin-top:8px;font-size:12px;color:var(--grau)">Der angezeigte Beitrag ist ein <b>unverbindlicher Indikator</b> – den finalen Preis verhandeln wir am Markt.</p></div>';
+}
+function modCard(id,t){
+ var m=MODULE[id], on=S.mod[id], pr=t.lines[id]||0;
+ var sw='<label class="switch"><input type="checkbox" data-mod="'+id+'"'+(on?" checked":"")+(m.pflicht?" disabled":"")+'/><span class="slider"></span></label>';
+ var html='<div class="mod '+(on?"on":"off")+'"><div class="top"><div>'+
+   '<div class="ttl">'+m.label+(m.pflicht?'<span class="tag">Pflicht</span>':'<span class="tag opt">Wählbar</span>')+'</div></div>'+
+   '<div style="display:flex;align-items:flex-start;gap:12px">'+(on?'<div class="price">'+eur0(pr*(1+VST))+'<small>pro Jahr</small></div>':'')+sw+'</div></div>'+
+   '<div class="ben">'+m.benefit+'</div>'+(on?'':'<div class="ohne">'+m.ohne+'</div>');
+ if(id==="bhv"&&on){
+   if(S.amazon){html+=addonRow("amazon","Amazon-USA-Versicherungsbestätigung (COI)","Pflichtnachweis für Amazon-Seller in den USA – wird automatisch erstellt.",t.addons.amazon,S.addon_amazon);}
+   if(S.usa_export!=="keiner"){html+=addonRow("usa","USA-/Kanada-Export mitversichert","Deckt Schäden aus Verkäufen in die USA/Kanada ("+USA_LABEL[S.usa_export]+").",t.addons.usa,S.addon_usa);}
+ }
+ return html+'</div>';
+}
+function addonRow(key,title,desc,price,on){
+ return '<div class="addon"><div class="ad-l"><b>'+title+'</b><span>'+desc+'</span></div>'+
+  '<div style="display:flex;align-items:center;gap:10px">'+(on?'<b style="color:#1a2b4a">+ '+eur0(price*(1+VST))+'</b>':'<span class="muted">abgewählt</span>')+
+  '<label class="switch"><input type="checkbox" data-addon="'+key+'"'+(on?" checked":"")+'/><span class="slider"></span></label></div></div>';
+}
+function viewBausteine(){
+ var t=calc();
+ return '<h1>Stell deinen <span class="g">Schutz</span> zusammen.</h1>'+
+ '<p class="sub">Jeder Baustein zeigt dir, was er bringt – und was dir ohne ihn fehlt. Schalt ab, was du nicht brauchst, der Preis-Indikator passt sich sofort an.</p>'+
+ ausschreibungInfo()+
+ ["bhv","vsh","cyber","sach"].map(function(id){return modCard(id,t);}).join("")+
+ totbar(t)+
+ '<div class="nav"><button class="btn ghost" id="back">← Zurück</button><button class="btn" id="next">Weiter zur Übersicht →</button></div>';
+}
+function totbar(t){
+ return '<div class="totbar"><div><div class="lab">Dein Beitrags-Indikator (am Markt verhandelt)</div><div class="big">'+eur(t.brutto)+' <small>/ Jahr inkl. 19% VSt</small></div>'+
+  '<div class="kor">Markt-Korridor: '+eur0(t.kor[0])+' – '+eur0(t.kor[1])+'</div></div></div>';
+}
+function viewUebersicht(){
+ var t=calc();
+ var rows='';
+ ["bhv","vsh","cyber","sach"].forEach(function(id){if(t.lines[id])rows+='<div class="summary-row"><span>'+MODULE[id].label+'</span><b>'+eur(t.lines[id]*(1+VST))+'</b></div>';});
+ return '<h1><span class="g">Übersicht</span> & Vorteile.</h1>'+
+ '<p class="sub">Letzter Feinschliff: Rabatte aktivieren, Zahlweise wählen. Alles rechnet live.</p>'+
+ '<div class="card">'+rows+
+  (t.dBundle?'<div class="summary-row"><span>Bündel-Rabatt (≥2 Bausteine)</span><b style="color:var(--ok)">– '+eur(t.dBundle*(1+VST))+'</b></div>':'')+
+  (t.dRun?'<div class="summary-row"><span>Laufzeit-Rabatt (3 Jahre)</span><b style="color:var(--ok)">– '+eur(t.dRun*(1+VST))+'</b></div>':'')+
+  (t.dStart?'<div class="summary-row"><span>Gründer-Rabatt</span><b style="color:var(--ok)">– '+eur(t.dStart*(1+VST))+'</b></div>':'')+
+  '<div class="summary-row tot"><span>Gesamt-Indikator pro Jahr</span><span>'+eur(t.brutto)+'</span></div></div>'+
+ '<div class="card"><label class="fld">Vorteile aktivieren</label>'+
+   togg("laufzeit3j","3 Jahre Laufzeit – 10 % Rabatt",S.laufzeit3j)+
+   togg("gruender","Gründer (Betrieb < 2 Jahre) – 15 % Rabatt",S.gruender)+
+   togg("sb","250 € Selbstbeteiligung – günstigerer Beitrag",S.sb)+
+ '</div>'+
+ '<div class="card"><label class="fld">Zahlweise</label><select id="zahlweise">'+
+   [["jaehrlich","jährlich (kein Zuschlag)"],["halbjaehrlich","halbjährlich"],["vierteljaehrlich","vierteljährlich (+2 %)"],["monatlich","monatlich (+3 %)"]].map(function(z){return '<option value="'+z[0]+'"'+(S.zahlweise===z[0]?" selected":"")+'>'+z[1]+'</option>';}).join("")+'</select></div>'+
+ totbar(t)+
+ '<div class="nav"><button class="btn ghost" id="back">← Bausteine</button><button class="btn" id="next">Zur Annahme →</button></div>';
+}
+function togg(key,label,on){
+ return '<div class="addon" style="border:none;padding:7px 0;margin:0"><div class="ad-l"><b>'+label+'</b></div>'+
+  '<label class="switch"><input type="checkbox" data-togg="'+key+'"'+(on?" checked":"")+'/><span class="slider"></span></label></div>';
+}
+var KF=[
+ ["schaeden","Gab es in den letzten 5 Jahren Schäden über 1.500 € oder bekannte Umstände, die zu einem Schaden führen können?"],
+ ["us_tochter","Gibt es Tochtergesellschaften oder Niederlassungen außerhalb des EWR (z. B. USA)?"],
+ ["it_security","Fehlt eine regelmäßige IT-Sicherung (Antivirus, Firewall, monatliche Updates)?"],
+ ["kk_daten","Speicherst du Bank-/Kreditkartendaten von Kunden auf eigenen Systemen?"],
+ ["hardware","Verkaufst du ausgeschlossene Waren (z. B. Waffen, Drohnen, Medizinprodukte)?"],
+ ["tuersicherung","Fehlt deinem Lager/Standort eine einbruchhemmende Sicherung?"]
+];
+function viewAnnahme(){
+ return '<h1>Fast geschafft – <span class="g">kurze Bestätigung</span>.</h1>'+
+ '<p class="sub">Zum Schluss sechs schnelle Ja/Nein-Fragen. In aller Regel ist alles „Nein" – dann steht deiner Police nichts im Weg.</p>'+
+ '<div class="card">'+KF.map(function(q){var v=S.killer[q[0]];
+   return '<div class="kf"><div class="q">'+q[1]+'</div><div class="yn" data-kf="'+q[0]+'">'+
+     '<button class="'+(v===true?"ja":"")+'" data-v="ja">Ja</button>'+
+     '<button class="'+(v===false?"nein":"")+'" data-v="nein">Nein</button></div></div>';}).join("")+'</div>'+
+ '<div class="nav"><button class="btn ghost" id="back">← Übersicht</button><button class="btn" id="next">Daten & Unterschrift →</button></div>';
+}
+function viewAbschluss(){
+ var t=calc(), aus=nichtStandard();
+ return '<h1>'+(aus?'<span class="g">Kostenlose Ausschreibung</span> starten.':'Antrag <span class="g">bestücken & unterschreiben</span>.')+'</h1>'+
+ '<p class="sub">'+(aus?'Dein Fall ist individuell – wir holen für dich die besten Angebote am Markt ein. Deine Daten bereiten den Antrag schon vor.':'Deine Angaben füllen den Original-Antrag automatisch – du unterschreibst einmal, fertig.')+'</p>'+
+ '<div class="card"><label class="fld">Versicherungsnehmer</label>'+
+  '<div class="grid3"><select id="f_anrede"><option value="herr"'+(S.anrede==="herr"?" selected":"")+'>Herr</option><option value="frau"'+(S.anrede==="frau"?" selected":"")+'>Frau</option></select>'+
+   '<input type="text" id="f_vorname" placeholder="Vorname" value="'+S.vorname+'"/>'+
+   '<input type="text" id="f_nachname" placeholder="Nachname" value="'+S.nachname+'"/></div>'+
+  '<div style="margin-top:10px"><input type="text" id="f_firma" placeholder="Firma (z. B. Händler E-Commerce GmbH)" value="'+S.firma+'"/></div>'+
+  '<div class="grid2" style="margin-top:10px"><input type="text" id="f_strasse" placeholder="Straße" value="'+S.strasse+'"/><input type="text" id="f_hausnr" placeholder="Nr." value="'+S.hausnr+'"/></div>'+
+  '<div class="grid2" style="margin-top:10px"><input type="text" id="f_plz" placeholder="PLZ" value="'+S.plz+'"/><input type="text" id="f_ort" placeholder="Ort" value="'+S.ort+'"/></div>'+
+  '<div class="grid2" style="margin-top:10px"><input type="text" id="f_gruendung" placeholder="Gründungsjahr" value="'+S.gruendung+'"/><input type="text" id="f_beginn" placeholder="Gewünschter Beginn (TT.MM.JJJJ)" value="'+S.beginn+'"/></div></div>'+
+ (aus?'':'<div class="card"><label class="fld">SEPA-Lastschrift</label>'+
+  '<input type="text" id="f_iban" placeholder="IBAN" value="'+S.sepa.iban+'"/>'+
+  '<div class="grid2" style="margin-top:10px"><input type="text" id="f_bic" placeholder="BIC" value="'+S.sepa.bic+'"/><input type="text" id="f_bank" placeholder="Bank" value="'+S.sepa.bank+'"/></div>'+
+  '<div style="margin-top:10px"><input type="text" id="f_inhaber" placeholder="Kontoinhaber" value="'+S.sepa.inhaber+'"/></div></div>')+
+ '<div class="card"><label class="fld">'+(aus?'Unterschrift (Maklervollmacht für die Ausschreibung)':'Unterschrift')+'</label><canvas class="sig" id="sig"></canvas>'+
+  '<div style="display:flex;justify-content:space-between;margin-top:8px"><span class="muted" id="sigOrt">'+(S.ort||"Ort")+', '+(S.beginn||"Datum")+'</span><button class="btn ghost" id="sigClear" style="padding:6px 14px;font-size:13px">Neu unterschreiben</button></div></div>'+
+ totbar(t)+
+ '<div class="nav"><button class="btn ghost" id="back">← Zurück</button><button class="btn" id="finish" disabled>'+(aus?'Kostenlose Ausschreibung starten →':'Antrag policierfertig erstellen →')+'</button></div>';
+}
+function viewDone(){
+ var t=calc(), aus=nichtStandard();
+ var mods=Object.keys(t.lines).map(function(id){return '<span class="pill">'+MODULE[id].label+' · '+eur0(t.lines[id]*(1+VST))+'</span>';}).join("");
+ return '<div class="card cert"><div class="big">'+(aus?'Ausschreibung läuft.':'Antrag ist policierfertig.')+'</div>'+
+  '<p class="muted" style="max-width:480px;margin:0 auto 10px">'+(aus?'Wir holen jetzt für dich die besten Angebote am Markt ein und melden uns mit den Ergebnissen.':'Dein Original-HISCOX-Antrag wurde mit allen Feldern bestückt und mit deiner Unterschrift versehen – bereit zur sofortigen Policierung.')+'</p>'+
+  '<div style="margin:14px 0">'+mods+'</div>'+
+  '<div class="summary-row tot" style="justify-content:center;gap:12px"><span>Beitrags-Indikator</span><span>'+eur(t.brutto)+' / Jahr</span></div></div>'+
+ '<div class="card"><label class="fld">Das wird übermittelt (Payload)</label><pre class="muted" id="payload" style="white-space:pre-wrap;font-size:11px;max-height:240px;overflow:auto;background:#fbfaf6;padding:12px;border-radius:10px;border:1px solid var(--line)"></pre>'+
+  '<button class="btn" id="copyPayload" style="margin-top:10px">Payload kopieren</button></div>';
+}
+function bind(){
+ var n=$("#next"); if(n)n.onclick=function(){S.step++;render();};
+ var b=$("#back"); if(b)b.onclick=function(){S.step--;render();};
+ var sg=$("#schutz"); if(sg)sg.onclick=function(e){var c=e.target.closest(".vcard");if(!c)return;S.wichtig[c.dataset.s]=!S.wichtig[c.dataset.s];render();};
+ var cm=$("#commit"); if(cm)cm.onclick=function(){S.commitment=true;S.mod={bhv:true,vsh:S.wichtig.vsh,cyber:S.wichtig.cyber,sach:S.wichtig.sach};S.step=1;render();};
+ var kat=$("#kat"); if(kat)kat.onclick=function(e){var c=e.target.closest(".chip");if(!c)return;var k=c.dataset.k;var i=S.kategorien.indexOf(k);if(i>=0)S.kategorien.splice(i,1);else S.kategorien.push(k);render();};
+ var kanal=$("#kanal"); if(kanal)kanal.onclick=function(e){var c=e.target.closest(".chip");if(!c)return;var k=c.dataset.c;S.kanal[k]=!S.kanal[k];S.amazon=!!S.kanal.amazon;render();};
+ var um=$("#umsatz"); if(um)um.oninput=function(){S.umsatz_gesamt=+this.value;render();};
+ var ux=$("#umsatz_exakt"); if(ux)ux.oninput=function(){S.umsatz_exakt=this.value;};
+ var usa=$("#usa"); if(usa)usa.onchange=function(){S.usa_export=this.value;render();};
+ var si=$("#sumIdx"); if(si)si.onchange=function(){S.sumIdx=+this.value;render();};
+ var wl=$("#weblinks"); if(wl)wl.oninput=function(){S.weblinks=this.value;};
+ var be=$("#beschreibung"); if(be)be.oninput=function(){S.beschreibung=this.value;};
+ document.querySelectorAll("[data-mod]").forEach(function(el){el.onchange=function(){S.mod[el.dataset.mod]=el.checked;render();};});
+ document.querySelectorAll("[data-addon]").forEach(function(el){el.onchange=function(){if(el.dataset.addon==="amazon")S.addon_amazon=el.checked;else S.addon_usa=el.checked;render();};});
+ document.querySelectorAll("[data-togg]").forEach(function(el){el.onchange=function(){S[el.dataset.togg]=el.checked;render();};});
+ var zw=$("#zahlweise"); if(zw)zw.onchange=function(){S.zahlweise=this.value;render();};
+ document.querySelectorAll("[data-kf]").forEach(function(g){g.onclick=function(e){var btn=e.target.closest("button");if(!btn)return;S.killer[g.dataset.kf]=(btn.dataset.v==="ja");render();};});
+ [["f_vorname","vorname"],["f_nachname","nachname"],["f_firma","firma"],["f_strasse","strasse"],["f_hausnr","hausnr"],["f_plz","plz"],["f_ort","ort"],["f_gruendung","gruendung"],["f_beginn","beginn"]].forEach(function(p){var el=$("#"+p[0]);if(el)el.oninput=function(){S[p[1]]=this.value;checkFinish();var so=$("#sigOrt");if(so)so.textContent=(S.ort||"Ort")+", "+(S.beginn||"Datum");};});
+ var an=$("#f_anrede");if(an)an.onchange=function(){S.anrede=this.value;};
+ [["f_iban","iban"],["f_bic","bic"],["f_bank","bank"],["f_inhaber","inhaber"]].forEach(function(p){var el=$("#"+p[0]);if(el)el.oninput=function(){S.sepa[p[1]]=this.value;};});
+ if($("#sig"))initSig();
+ var fin=$("#finish");if(fin)fin.onclick=function(){doFinish();};
+ var cp=$("#copyPayload");if(cp)cp.onclick=function(){navigator.clipboard&&navigator.clipboard.writeText($("#payload").textContent);cp.textContent="Kopiert ✓";};
+ if($("#payload")){var _pp=buildPayload();if(_pp.signature_png)_pp.signature_png="<eSign erfasst>";$("#payload").textContent=JSON.stringify(_pp,null,2);}
+}
+function initSig(){
+ var c=$("#sig");var dpr=window.devicePixelRatio||1;var r=c.getBoundingClientRect();
+ c.width=r.width*dpr;c.height=r.height*dpr;var ctx=c.getContext("2d");ctx.scale(dpr,dpr);
+ ctx.strokeStyle="#1a2b4a";ctx.lineWidth=2;ctx.lineJoin="round";ctx.lineCap="round";
+ var drawing=false,last=null,has=false;
+ function pos(e){var b=c.getBoundingClientRect();var t=e.touches?e.touches[0]:e;return{x:t.clientX-b.left,y:t.clientY-b.top};}
+ function down(e){drawing=true;last=pos(e);e.preventDefault();}
+ function move(e){if(!drawing)return;var p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;has=true;e.preventDefault();}
+ function up(){if(!drawing)return;drawing=false;if(has){S.signature=c.toDataURL("image/png");checkFinish();}}
+ c.addEventListener("mousedown",down);c.addEventListener("mousemove",move);window.addEventListener("mouseup",up);
+ c.addEventListener("touchstart",down);c.addEventListener("touchmove",move);c.addEventListener("touchend",up);
+ var cl=$("#sigClear");if(cl)cl.onclick=function(){ctx.clearRect(0,0,c.width,c.height);has=false;S.signature=null;checkFinish();};
+}
+function checkFinish(){var fin=$("#finish");if(!fin)return;
+ var ok=S.vorname&&S.nachname&&S.firma&&S.plz&&S.ort&&S.beginn&&S.signature;
+ fin.disabled=!ok;}
+function buildPayload(){
+ var alle=[],hx={};
+ S.kategorien.forEach(function(id){var k=KATBY[id];if(k){alle.push(k.label);if(k.hx)hx[HXNAME[k.hx]]=1;}});
+ var kAlle=[]; KANAELE.forEach(function(c){if(S.kanal[c.id])kAlle.push(c.label);});
+ return{anrede:S.anrede,vorname:S.vorname,nachname:S.nachname,firma:S.firma,legal_entity:true,
+  gruendung:S.gruendung,strasse:S.strasse,hausnr:S.hausnr,plz:S.plz,ort:S.ort,land:"Deutschland",
+  umsatz_gesamt:S.umsatz_gesamt,umsatz_exakt:S.umsatz_exakt,umsatz_individuell:(S.umsatz_gesamt>=5000000),
+  sum_idx:S.sumIdx,standorte:S.standorte,
+  module:Object.keys(S.mod).filter(function(k){return S.mod[k];}),
+  kategorien:Object.keys(hx),kategorien_alle:alle,kanaele:kAlle,
+  weblinks:S.weblinks,beschreibung:S.beschreibung,
+  amazon:(S.amazon&&S.addon_amazon),usa_export:(S.addon_usa?S.usa_export:"keiner"),
+  sb:S.sb,gruender:S.gruender,laufzeit3j:S.laufzeit3j,zahlweise:S.zahlweise,
+  beginn:S.beginn,antragsdatum:S.beginn,
+  ausschreibung:nichtStandard(),
+  killer:S.killer,
+  sepa:S.sepa.iban?{iban:S.sepa.iban,bic:S.sepa.bic,bank:S.sepa.bank,inhaber:S.sepa.inhaber}:null,
+  signature_png:S.signature,
+  broker_name:"Jan Ruhoff Makler mit Fliege",broker_email:"team@maklermitfliege.de",broker_pool:"PL3U1H",hv:"3880"};
+}
+function doFinish(){
+ var a=$("#app"), aus=nichtStandard();
+ a.innerHTML='<div class="fly-load"><svg class="fly" viewBox="0 0 52 36"><path d="M26 18 L6 6 Q2 4 2 10 L2 26 Q2 32 6 30 Z" fill="#0b3d2e"/><path d="M26 18 L46 6 Q50 4 50 10 L50 26 Q50 32 46 30 Z" fill="#0b3d2e"/><rect x="22" y="12" width="8" height="12" rx="2" fill="#b08d3f"/></svg><div class="muted">'+(aus?'Deine Ausschreibung wird vorbereitet …':'Antrag wird mit deinen Angaben bestückt &amp; signiert …')+'</div></div>';
+ if(location.protocol.indexOf("http")===0){var ep=aus?"/api/ausschreibung":"/api/antrag";fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(buildPayload())}).then(function(r){if(!r.ok)throw new Error("Server "+r.status);return r.blob();}).then(function(b){var u=URL.createObjectURL(b);var dl=document.createElement("a");dl.href=u;dl.download=aus?"VERSIANER-Ausschreibung.txt":"VERSIANER-Antrag.pdf";document.body.appendChild(dl);dl.click();dl.remove();S.step=5;renderSteps();a.innerHTML=viewDone()+'<div class="card"><p class="muted">\u2713 '+(aus?"Ausschreibung":"Policierfertiger Antrag")+' erstellt & heruntergeladen.</p></div>';bind();}).catch(function(e){a.innerHTML='<div class="card"><b>Fehler:</b> '+e.message+'</div>';});}else{setTimeout(function(){S.step=5;renderSteps();a.innerHTML=viewDone();bind();},2200);}
+}
+render();
+</script>
+</body>
+</html>

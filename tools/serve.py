@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Live-Bridge für den Online-Shops-Funnel.
+  GET  /                 -> liefert den Funnel (onlineshops/index.html)
+  POST /api/antrag       -> Payload -> Schätz-Tarif -> echter HISCOX-Antrag (PDF, signiert)
+  POST /api/ausschreibung-> Payload -> Ausschreibungs-Briefing (txt) für die 3-Träger-Anfrage
+
+Start:  python3 tools/serve.py   (Default Port 8080)
+Der Funnel erkennt http:// automatisch und holt sich die Datei vom Backend.
+"""
+import os, sys, json, tempfile, base64, datetime
+from flask import Flask, request, send_file, Response
+HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
+sys.path.insert(0, HERE)
+import antrag_engine as eng
+
+FUNNEL = os.path.join(ROOT, "onlineshops", "index.html")
+VORLAGE = os.path.join(ROOT, "vorlagen", "HISCOX-Shops-Antrag_blank.pdf")
+
+app = Flask(__name__)
+
+@app.get("/")
+def home():
+    return send_file(FUNNEL)
+
+@app.get("/health")
+def health():
+    return {"ok": True, "vorlage": os.path.exists(VORLAGE)}
+
+def _sig_to_path(payload):
+    """eSign-DataURL -> temporäre PNG-Datei, Pfad in payload['signature_png']."""
+    sig = payload.get("signature_png", "")
+    if isinstance(sig, str) and sig.startswith("data:image"):
+        b64 = sig.split(",", 1)[1]
+        fd, p = tempfile.mkstemp(suffix=".png"); os.close(fd)
+        with open(p, "wb") as f: f.write(base64.b64decode(b64))
+        payload["signature_png"] = p
+        return p
+    payload["signature_png"] = None
+    return None
+
+@app.post("/api/antrag")
+def antrag():
+    payload = request.get_json(force=True)
+    sigpath = _sig_to_path(payload)
+    fd, pj = tempfile.mkstemp(suffix=".json"); os.close(fd)
+    with open(pj, "w", encoding="utf-8") as f: json.dump(payload, f, ensure_ascii=False)
+    fd, out = tempfile.mkstemp(suffix=".pdf"); os.close(fd)
+    try:
+        eng.run(pj, VORLAGE, out)   # rechnet Tarif + befüllt Antrag + stempelt Unterschrift
+        name = (payload.get("firma") or payload.get("nachname") or "Antrag").replace(" ", "-")
+        return send_file(out, mimetype="application/pdf", as_attachment=True,
+                         download_name="VERSIANER-Antrag_"+name+".pdf")
+    finally:
+        for p in (pj, sigpath):
+            try:
+                if p: os.remove(p)
+            except OSError: pass
+
+@app.post("/api/ausschreibung")
+def ausschreibung():
+    p = request.get_json(force=True)
+    t = eng.calc_tarif(p)
+    L = []
+    L.append("VERSIANER · MARKT-AUSSCHREIBUNG (Online-Shop / E-Commerce)")
+    L.append("Erstellt: "+datetime.datetime.now().strftime("%d.%m.%Y %H:%M")+"  ·  Makler PL3U1H")
+    L.append("="*64)
+    L.append("\nVERSICHERUNGSNEHMER")
+    L.append(f"  {p.get('anrede','').title()} {p.get('vorname','')} {p.get('nachname','')} · {p.get('firma','')}")
+    L.append(f"  {p.get('strasse','')} {p.get('hausnr','')}, {p.get('plz','')} {p.get('ort','')} · gegr. {p.get('gruendung','')}")
+    L.append("\nRISIKO")
+    L.append(f"  Produktkategorien: {', '.join(p.get('kategorien_alle',[])) or '-'}")
+    L.append(f"  Vertriebskanäle:   {', '.join(p.get('kanaele',[])) or '-'}")
+    um = p.get('umsatz_exakt') or (f"{p.get('umsatz_gesamt',0):,} €".replace(',', '.'))
+    L.append(f"  Jahresumsatz:      {um}{'  (INDIVIDUELL ≥5 Mio)' if p.get('umsatz_individuell') else ''}")
+    L.append(f"  USA/Kanada-Export: {p.get('usa_export','keiner')}")
+    L.append(f"  Webshop-Link(s):   {p.get('weblinks','') or '-'}")
+    L.append(f"  Gewünschte Bausteine: {', '.join(p.get('module',[]))}")
+    L.append(f"  Beschreibung: {p.get('beschreibung','') or '-'}")
+    L.append("\nBEITRAGS-INDIKATOR (Schätzung, Markt verhandelt)")
+    for m in t["module"]:
+        L.append(f"  - {m['label']}: {eng.eur(m['brutto'])} brutto/Jahr")
+    L.append(f"  GESAMT: {eng.eur(t['brutto'])} / Jahr  (Korridor {eng.eur(t['korridor'][0])}–{eng.eur(t['korridor'][1])})")
+    # Träger-Routing
+    usa = p.get("usa_export","keiner")
+    if p.get("umsatz_individuell"): traeger="HISCOX + Markel + AXA (Großrisiko, individuell)"
+    elif usa in ("hoch","sehr_hoch"): traeger="HISCOX + Markel (+ AXA)"
+    elif usa in ("gering","mittel"): traeger="HISCOX (Frontline, COI) + Markel + andsafe"
+    else: traeger="HISCOX + andsafe + 1 Volumen-Player (Ameise)"
+    L.append("\nAUSSCHREIBUNG AN: "+traeger)
+    L.append("ANNAHME-CHECK: "+("AUFFÄLLIG – manuell prüfen" if any(p.get('killer',{}).values()) else "sauber (alle Killerfragen nein)"))
+    body = "\n".join(L)
+    return Response(body, mimetype="text/plain",
+                    headers={"Content-Disposition":"attachment; filename=VERSIANER-Ausschreibung.txt"})
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "8080"))
+    app.run(host="0.0.0.0", port=port, debug=False)
