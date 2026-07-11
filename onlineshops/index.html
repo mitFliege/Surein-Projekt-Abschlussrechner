@@ -123,6 +123,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 </div>
 <script>
 "use strict";
+// PLATZHALTER-Tarifkonstanten (Fallback für file://-Demo) — bei http(s) überschreibt loadKonstanten()
+// sie mit den Live-Werten aus tools/antrag_engine.py (Single Source of Truth, HANDOFF §7.1).
+// Jan-Freigabe 11.07.2026: live mit "ca."/indikativ-Kennzeichnung, bis reale Trägersätze feststehen.
 var VST=0.19;
 var UMSATZ_BANDS=[[100000,1.00],[250000,1.35],[500000,1.8],[1000000,2.5],[5000000,4.2]];
 var SUM_FACTOR={0:1.00,1:1.30,2:1.70,3:2.20};
@@ -216,6 +219,7 @@ var S={
  anrede:"herr",vorname:"",nachname:"",firma:"",gruendung:"",strasse:"",hausnr:"",plz:"",ort:"",
  sepa:{iban:"",bic:"",bank:"",inhaber:""}, beginn:"", signature:null
 };
+var UTM=(function(){try{var q=new URLSearchParams(location.search);return{utm_source:q.get("utm_source")||"",utm_medium:q.get("utm_medium")||"",utm_campaign:q.get("utm_campaign")||""};}catch(e){return{utm_source:"",utm_medium:"",utm_campaign:""};}})();
 var STEPS=["Dein Schutz","Dein Betrieb","Zusammenstellen","Übersicht","Annahme","Abschluss"];
 var $=function(s,r){return (r||document).querySelector(s);};
 var SCHUTZ=[
@@ -311,7 +315,7 @@ function viewBausteine(){
  '<div class="nav"><button class="btn ghost" id="back">← Zurück</button><button class="btn" id="next">Weiter zur Übersicht →</button></div>';
 }
 function totbar(t){
- return '<div class="totbar"><div><div class="lab">Dein Beitrags-Indikator (am Markt verhandelt)</div><div class="big">'+eur(t.brutto)+' <small>/ Jahr inkl. 19% VSt</small></div>'+
+ return '<div class="totbar"><div><div class="lab">Dein Beitrags-Indikator (am Markt verhandelt)</div><div class="big">ca. '+eur(t.brutto)+' <small>/ Jahr inkl. 19% VSt</small></div>'+
   '<div class="kor">Markt-Korridor: '+eur0(t.kor[0])+' – '+eur0(t.kor[1])+'</div></div></div>';
 }
 function viewUebersicht(){
@@ -383,7 +387,7 @@ function viewDone(){
  return '<div class="card cert"><div class="big">'+(aus?'Ausschreibung läuft.':'Antrag ist policierfertig.')+'</div>'+
   '<p class="muted" style="max-width:480px;margin:0 auto 10px">'+(aus?'Wir holen jetzt für dich die besten Angebote am Markt ein und melden uns mit den Ergebnissen.':'Dein Original-HISCOX-Antrag wurde mit allen Feldern bestückt und mit deiner Unterschrift versehen – bereit zur sofortigen Policierung.')+'</p>'+
   '<div style="margin:14px 0">'+mods+'</div>'+
-  '<div class="summary-row tot" style="justify-content:center;gap:12px"><span>Beitrags-Indikator</span><span>'+eur(t.brutto)+' / Jahr</span></div></div>'+
+  '<div class="summary-row tot" style="justify-content:center;gap:12px"><span>Beitrags-Indikator</span><span>ca. '+eur(t.brutto)+' / Jahr</span></div></div>'+
  '<div class="card"><label class="fld">Das wird übermittelt (Payload)</label><pre class="muted" id="payload" style="white-space:pre-wrap;font-size:11px;max-height:240px;overflow:auto;background:#fbfaf6;padding:12px;border-radius:10px;border:1px solid var(--line)"></pre>'+
   '<button class="btn" id="copyPayload" style="margin-top:10px">Payload kopieren</button></div>';
 }
@@ -447,6 +451,7 @@ function buildPayload(){
   killer:S.killer,
   sepa:S.sepa.iban?{iban:S.sepa.iban,bic:S.sepa.bic,bank:S.sepa.bank,inhaber:S.sepa.inhaber}:null,
   signature_png:S.signature,
+  utm_source:UTM.utm_source,utm_medium:UTM.utm_medium,utm_campaign:UTM.utm_campaign,
   broker_name:"Jan Ruhoff Makler mit Fliege",broker_email:"team@maklermitfliege.de",broker_pool:"PL3U1H",hv:"3880"};
 }
 function doFinish(){
@@ -454,7 +459,16 @@ function doFinish(){
  a.innerHTML='<div class="fly-load"><svg class="fly" viewBox="0 0 52 36"><path d="M26 18 L6 6 Q2 4 2 10 L2 26 Q2 32 6 30 Z" fill="#0b3d2e"/><path d="M26 18 L46 6 Q50 4 50 10 L50 26 Q50 32 46 30 Z" fill="#0b3d2e"/><rect x="22" y="12" width="8" height="12" rx="2" fill="#b08d3f"/></svg><div class="muted">'+(aus?'Deine Ausschreibung wird vorbereitet …':'Antrag wird mit deinen Angaben bestückt &amp; signiert …')+'</div></div>';
  if(location.protocol.indexOf("http")===0){var ep=aus?"/api/ausschreibung":"/api/antrag";fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(buildPayload())}).then(function(r){if(!r.ok)throw new Error("Server "+r.status);return r.blob();}).then(function(b){var u=URL.createObjectURL(b);var dl=document.createElement("a");dl.href=u;dl.download=aus?"VERSIANER-Ausschreibung.txt":"VERSIANER-Antrag.pdf";document.body.appendChild(dl);dl.click();dl.remove();S.step=5;renderSteps();a.innerHTML=viewDone()+'<div class="card"><p class="muted">\u2713 '+(aus?"Ausschreibung":"Policierfertiger Antrag")+' erstellt & heruntergeladen.</p></div>';bind();}).catch(function(e){a.innerHTML='<div class="card"><b>Fehler:</b> '+e.message+'</div>';});}else{setTimeout(function(){S.step=5;renderSteps();a.innerHTML=viewDone();bind();},2200);}
 }
-render();
+function loadKonstanten(cb){
+ // Same-Origin-Live-Deploy: Tarifkonstanten von /api/tarifkonstanten holen (Python = Single Source of Truth).
+ // file://-Demo bzw. Fetch-Fehler: eingebettete Platzhalter oben bleiben unverändert.
+ if(location.protocol.indexOf("http")!==0){cb();return;}
+ fetch("/api/tarifkonstanten").then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(k){
+   VST=k.VST;UMSATZ_BANDS=k.UMSATZ_BANDS;SUM_FACTOR=k.SUM_FACTOR;BASE=k.BASE;AMAZON_COI=k.AMAZON_COI;
+   USA_EXPORT=k.USA_EXPORT;DISC=k.DISC;PAY_SUR=k.PAY_SUR;cb();
+ }).catch(function(){cb();});
+}
+loadKonstanten(render);
 </script>
 </body>
 </html>

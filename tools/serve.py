@@ -29,6 +29,41 @@ def home():
 def health():
     return {"ok": True, "vorlage": os.path.exists(VORLAGE)}
 
+@app.get("/api/tarifkonstanten")
+def tarifkonstanten():
+    """Single Source of Truth für die JS-Anzeige (index.html loadKonstanten()) -
+    verhindert Drift zwischen Anzeige-Rechner und Antrags-Engine (HANDOFF §7.1)."""
+    return {
+        "VST": eng.VST, "UMSATZ_BANDS": eng.UMSATZ_BANDS, "SUM_FACTOR": eng.SUM_FACTOR,
+        "BASE": eng.BASE, "AMAZON_COI": eng.AMAZON_COI, "USA_EXPORT": eng.USA_EXPORT,
+        "DISC": eng.DISCOUNTS, "PAY_SUR": eng.PAYMENT_SURCHARGE,
+    }
+
+def _lead_webhook(kind, payload, tarif):
+    """Best-effort: Lead + Tarif-Indikator an Make -> Pipedrive. Nie den Haupt-Response blockieren/kaputt machen."""
+    url = os.environ.get("LEAD_WEBHOOK_URL")
+    if not url:
+        return
+    try:
+        import requests
+        slim = {
+            "kind": kind, "ts": datetime.datetime.now().isoformat(),
+            "anrede": payload.get("anrede"), "vorname": payload.get("vorname"), "nachname": payload.get("nachname"),
+            "firma": payload.get("firma"), "strasse": payload.get("strasse"), "hausnr": payload.get("hausnr"),
+            "plz": payload.get("plz"), "ort": payload.get("ort"), "gruendung": payload.get("gruendung"),
+            "kategorien_alle": payload.get("kategorien_alle"), "kanaele": payload.get("kanaele"),
+            "umsatz_gesamt": payload.get("umsatz_gesamt"), "umsatz_exakt": payload.get("umsatz_exakt"),
+            "usa_export": payload.get("usa_export"), "module": payload.get("module"),
+            "ausschreibung": payload.get("ausschreibung"), "killer": payload.get("killer"),
+            "beginn": payload.get("beginn"), "weblinks": payload.get("weblinks"), "beschreibung": payload.get("beschreibung"),
+            "tarif_brutto": tarif.get("brutto"), "tarif_korridor": tarif.get("korridor"),
+            "utm_source": payload.get("utm_source"), "utm_medium": payload.get("utm_medium"), "utm_campaign": payload.get("utm_campaign"),
+            "broker_pool": payload.get("broker_pool"), "hv": payload.get("hv"),
+        }
+        requests.post(url, json=slim, timeout=4)
+    except Exception:
+        pass
+
 def _sig_to_path(payload):
     """eSign-DataURL -> temporäre PNG-Datei, Pfad in payload['signature_png']."""
     sig = payload.get("signature_png", "")
@@ -49,7 +84,8 @@ def antrag():
     with open(pj, "w", encoding="utf-8") as f: json.dump(payload, f, ensure_ascii=False)
     fd, out = tempfile.mkstemp(suffix=".pdf"); os.close(fd)
     try:
-        eng.run(pj, VORLAGE, out)   # rechnet Tarif + befüllt Antrag + stempelt Unterschrift
+        t = eng.run(pj, VORLAGE, out)   # rechnet Tarif + befüllt Antrag + stempelt Unterschrift
+        _lead_webhook("antrag", payload, t)
         name = (payload.get("firma") or payload.get("nachname") or "Antrag").replace(" ", "-")
         return send_file(out, mimetype="application/pdf", as_attachment=True,
                          download_name="VERSIANER-Antrag_"+name+".pdf")
@@ -63,6 +99,7 @@ def antrag():
 def ausschreibung():
     p = request.get_json(force=True)
     t = eng.calc_tarif(p)
+    _lead_webhook("ausschreibung", p, t)
     L = []
     L.append("VERSIANER · MARKT-AUSSCHREIBUNG (Online-Shop / E-Commerce)")
     L.append("Erstellt: "+datetime.datetime.now().strftime("%d.%m.%Y %H:%M")+"  ·  Makler PL3U1H")
