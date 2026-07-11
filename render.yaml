@@ -9,3 +9,5 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.10
+      - key: LEAD_WEBHOOK_URL
+        sync: false   # bewusst NICHT im (oeffentlichen) Repo -- Wert manuell im Render-Dashboard setzen
