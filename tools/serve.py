@@ -15,15 +15,25 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
 import antrag_engine as eng
+import dno_engine as dno
 
 FUNNEL = os.path.join(ROOT, "onlineshops", "index.html")
 VORLAGE = os.path.join(ROOT, "vorlagen", "HISCOX-Shops-Antrag_blank.pdf")
+DNO_FUNNEL = os.path.join(ROOT, "dno", "index.html")
+# Echte Killerfragen fuer D&O -- "bilanz" (Eigenkapital positiv? Ja=gut) und "vorversicherung"/
+# "beteiligungen" (rein informativ) sind bewusst ausgenommen, s. data/dno_strecke.json annahme_fragen[].killer.
+DNO_KILLER_KEYS = ("verfahren", "boerse", "anspruch", "vorschaeden", "ablehnung", "insolvenz")
 
 app = Flask(__name__)
 
 @app.get("/")
 def home():
     return send_file(FUNNEL)
+
+@app.get("/dno/")
+@app.get("/dno")
+def dno_home():
+    return send_file(DNO_FUNNEL)
 
 @app.get("/health")
 def health():
@@ -39,15 +49,24 @@ def tarifkonstanten():
         "DISC": eng.DISCOUNTS, "PAY_SUR": eng.PAYMENT_SURCHARGE,
     }
 
-def _lead_webhook(kind, payload, tarif):
-    """Best-effort: Lead + Tarif-Indikator an Make -> Pipedrive. Nie den Haupt-Response blockieren/kaputt machen."""
-    url = os.environ.get("LEAD_WEBHOOK_URL")
+def _lead_webhook(kind, payload, tarif, killer_keys=None, url_env="LEAD_WEBHOOK_URL"):
+    """Best-effort: Lead + Tarif-Indikator an Make -> Pipedrive. Nie den Haupt-Response blockieren/kaputt machen.
+
+    killer_keys: welche payload['killer']-Schluessel als Red-Flag zaehlen. None = alle Werte (Online-Shop-Verhalten,
+    dort ist bei JEDER Killerfrage "Ja" ein Red-Flag). Sparten mit gemischt-positiven Fragen (z.B. D&O "Eigenkapital
+    positiv?") MUESSEN eine explizite Teilmenge uebergeben, sonst wird eine gute Antwort faelschlich als auffaellig gemeldet.
+    """
+    url = os.environ.get(url_env)
     if not url:
         return
     try:
         import requests
         korridor = tarif.get("korridor") or (None, None)
         killer = payload.get("killer") or {}
+        if killer_keys is None:
+            auffaellig = any(killer.values()) if killer else False
+        else:
+            auffaellig = any(killer.get(k) for k in killer_keys)
         # Nur flache Skalarfelder (kein Array/Dict) -- robust fuers Make-Webhook-Mapping,
         # gleiches Muster wie das bewaehrte Szenario "Rechner-Lead -> Pipedrive".
         slim = {
@@ -60,11 +79,15 @@ def _lead_webhook(kind, payload, tarif):
             "umsatz_gesamt": payload.get("umsatz_gesamt"), "umsatz_exakt": payload.get("umsatz_exakt"),
             "usa_export": payload.get("usa_export"), "module": ", ".join(payload.get("module") or []),
             "ausschreibung": bool(payload.get("ausschreibung")),
-            "killer_auffaellig": any(killer.values()) if killer else False,
+            "killer_auffaellig": auffaellig,
             "beginn": payload.get("beginn"), "weblinks": payload.get("weblinks"), "beschreibung": payload.get("beschreibung"),
             "tarif_brutto": tarif.get("brutto"), "tarif_korridor_min": korridor[0], "tarif_korridor_max": korridor[1],
             "utm_source": payload.get("utm_source"), "utm_medium": payload.get("utm_medium"), "utm_campaign": payload.get("utm_campaign"),
             "broker_pool": payload.get("broker_pool"), "hv": payload.get("hv"),
+            # D&O-Felder (bei anderen Sparten schlicht None -- Make zeigt sie dann nicht/leer)
+            "rechtsform": payload.get("rechtsform"), "umsatz_band": payload.get("umsatz_band"),
+            "organe": payload.get("organe"), "versicherungssumme": payload.get("versicherungssumme"),
+            "gruendung_neu": bool(payload.get("gruendung_neu")) if "gruendung_neu" in payload else None,
         }
         requests.post(url, json=slim, timeout=4)
     except Exception:
@@ -137,6 +160,54 @@ def ausschreibung():
     body = "\n".join(L)
     return Response(body, mimetype="text/plain",
                     headers={"Content-Disposition":"attachment; filename=VERSIANER-Ausschreibung.txt"})
+
+@app.get("/api/dno/tarifkonstanten")
+def dno_tarifkonstanten():
+    """Single Source of Truth fuer dno/index.html loadKonstanten() -- gleiches Muster wie /api/tarifkonstanten."""
+    return {
+        "VST": dno.VST, "BASE": dno.BASE, "UMSATZ_BANDS": dno.UMSATZ_BANDS, "SUM_FACTOR": dno.SUM_FACTOR,
+        "ORGAN_ZUSCHLAG_PRO_WEITEREM": dno.ORGAN_ZUSCHLAG_PRO_WEITEREM,
+        "DISCOUNTS": dno.DISCOUNTS, "PAY_SUR": dno.PAYMENT_SURCHARGE,
+    }
+
+@app.post("/api/dno/ausschreibung")
+def dno_ausschreibung():
+    """D&O ist ausschliesslich Ausschreibung -- kein Self-Service-Antrag (Frontline VOV, s. dno_strecke.json)."""
+    p = request.get_json(force=True)
+    t = dno.calc_tarif(p)
+    _lead_webhook("dno_ausschreibung", p, t, killer_keys=DNO_KILLER_KEYS, url_env="DNO_LEAD_WEBHOOK_URL")
+    L = []
+    L.append("VERSIANER · MARKT-AUSSCHREIBUNG (D&O · Geschäftsführerhaftung)")
+    L.append("Erstellt: "+datetime.datetime.now().strftime("%d.%m.%Y %H:%M")+"  ·  Makler PL3U1H")
+    L.append("="*64)
+    L.append("\nVERSICHERUNGSNEHMER")
+    L.append(f"  {p.get('anrede','').title()} {p.get('vorname','')} {p.get('nachname','')} · {p.get('firma','')}")
+    L.append(f"  {p.get('strasse','')} {p.get('hausnr','')}, {p.get('plz','')} {p.get('ort','')} · Rechtsform: {p.get('rechtsform','')}")
+    L.append("\nRISIKO")
+    L.append(f"  Jahresumsatz: {p.get('umsatz_band','-')}")
+    L.append(f"  Gründung < 36 Monate (Startup-Weiche): {'JA — individuell ausschreiben' if p.get('gruendung_neu') else 'nein'}")
+    L.append(f"  Anzahl Organe: {p.get('organe',1)}")
+    L.append(f"  Versicherungssumme: {p.get('versicherungssumme','-')}")
+    L.append(f"  Gewünschte Bausteine: {', '.join(p.get('module',[]))}")
+    L.append(f"  Beschreibung: {p.get('beschreibung','') or '-'}")
+    L.append("\nBEITRAGS-INDIKATOR (grober Schätz-Anker, Markt verhandelt -- KEINE verbindlichen Tarife, s. data/dno_strecke.json)")
+    for mid, betrag in t["lines"].items():
+        L.append(f"  - {dno.MODULE_LABEL.get(mid, mid)}: {dno.eur(round(betrag*(1+dno.VST),2))} brutto/Jahr")
+    L.append(f"  GESAMT: {dno.eur(t['brutto'])} / Jahr  (Korridor {dno.eur(t['korridor'][0])}–{dno.eur(t['korridor'][1])})")
+    # Traeger-Routing (aus data/dno_strecke.json routing)
+    if p.get("gruendung_neu") or p.get("umsatz_band") == "über 25 Mio. €":
+        traeger = "VOV + AIG + Chubb (Großrisiko/Startup, individuell)"
+    else:
+        traeger = "VOV (Frontline) + HISCOX + Markel"
+    L.append("\nAUSSCHREIBUNG AN: "+traeger)
+    # Nur echte Killerfragen zaehlen (s. dno_strecke.json annahme_fragen[].killer) -- "bilanz" (Ja=gut)
+    # und "vorversicherung"/"beteiligungen" (rein informativ) sind bewusst KEINE Red-Flags.
+    kf = p.get("killer", {})
+    dno_auffaellig = any(kf.get(k) for k in DNO_KILLER_KEYS)
+    L.append("ANNAHME-CHECK: "+("AUFFÄLLIG – manuell prüfen" if dno_auffaellig else "sauber (alle Killerfragen nein)"))
+    body = "\n".join(L)
+    return Response(body, mimetype="text/plain",
+                    headers={"Content-Disposition":"attachment; filename=VERSIANER-DO-Ausschreibung.txt"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
