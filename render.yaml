@@ -11,3 +11,5 @@ services:
         value: 3.12.10
       - key: LEAD_WEBHOOK_URL
         sync: false   # bewusst NICHT im (oeffentlichen) Repo -- Wert manuell im Render-Dashboard setzen
+      - key: DNO_LEAD_WEBHOOK_URL
+        sync: false   # D&O-Lead-Webhook, eigenes Make-Szenario -- Wert manuell im Render-Dashboard setzen
