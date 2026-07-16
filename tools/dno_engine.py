@@ -7,14 +7,15 @@ Kein Antrag-PDF: Frontline VOV ist ein Spezial-Pool ohne Self-Service-Antrag
 (kein Blank-Antrag verfuegbar, s. data/dno_strecke.json ausschreibung_only_grund).
 Nur calc_tarif() fuer den Beitrags-Indikator + das Ausschreibungs-Briefing.
 
-PLATZHALTER-Tarifkonstanten: Claude-Schaetz-Anker 12.07.2026, NICHT an echten
-VOV/HISCOX/Markel-Testangeboten kalibriert (anders als Online-Shops). Jan-Freigabe
-ausstehend -- s. data/dno_strecke.json tarif._hinweis.
+PLATZHALTER-Tarifkonstanten, REKALIBRIERT 16.07.2026 auf die bereits live stehende
+Preistabelle des D&O-Funnel-Quiz auf /d-o-versicherung-geschaeftsfuehrer (priceTable-
+Control der Sektion "D&O Funnel (5 Fragen)") -- s. data/dno_strecke.json tarif._hinweis.
+Noch immer NICHT an einem echten VOV/HISCOX/Markel-Testangebot kalibriert.
 """
 
 VST = 0.19
-BASE = {"firmen_do": 650, "strafrecht": 120, "persoenlich": 280}
-UMSATZ_BANDS = [(2_000_000, 1.0), (5_000_000, 1.6), (25_000_000, 2.8), (999_999_999, 4.5)]
+BASE = {"firmen_do": 840, "strafrecht": 120, "persoenlich": 280}
+UMSATZ_BANDS = [(2_000_000, 1.0), (5_000_000, 2.0), (25_000_000, 4.5), (999_999_999, 7.0)]
 UMSATZ_LABEL = ["bis 2 Mio. €", "2–5 Mio. €", "5–25 Mio. €", "über 25 Mio. €"]
 SUM_FACTOR = {0: 1.0, 1: 1.6, 2: 2.4, 3: 3.6, 4: 6.0}
 SUM_LABEL = ["250.000 €", "500.000 €", "1 Mio. €", "2 Mio. €", "5 Mio. €"]
